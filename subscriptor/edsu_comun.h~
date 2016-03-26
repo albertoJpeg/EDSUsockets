@@ -1,0 +1,19 @@
+/*
+   Incluya en este fichero todas las definiciones que pueden
+   necesitar compartir los módulos editor y subscriptor,
+   si es que las hubiera.
+*/
+
+#ifndef EDSU_H
+#define EDSU_H
+
+typedef struct env
+{
+  char *SERVIDOR;
+  char *PUERTO;
+}ENV;
+
+int obtener_entorno(ENV *ent);
+int conectar(ENV *ent);
+
+#endif

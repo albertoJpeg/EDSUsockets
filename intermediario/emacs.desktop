@@ -1,0 +1,173 @@
+;; -*- mode: emacs-lisp; coding: emacs-mule; -*-
+;; --------------------------------------------------------------------------
+;; Desktop File for Emacs
+;; --------------------------------------------------------------------------
+;; Created Sat Mar 26 02:09:55 2016
+;; Desktop file format version 206
+;; Emacs version 24.5.1
+
+;; Global section:
+(setq desktop-saved-frameset [frameset 1 (22261 57699 181336 486000) (desktop . "206") "serchiman@Serchiman" nil nil ((((font-backend xft x) (font . "-unknown-Ubuntu Mono-normal-normal-normal-*-17-*-*-*-m-0-iso10646-1") (font-parameter . "Ubuntu Mono 13") (border-width . 0) (internal-border-width . 0) (right-divider-width . 0) (bottom-divider-width . 0) (vertical-scroll-bars) (foreground-color . "#F8F8F2") (background-color . "#272822") (mouse-color . "#F8F8F2") (border-color . "black") (screen-gamma) (line-spacing) (left-fringe . 9) (right-fringe . 9) (scroll-bar-foreground) (scroll-bar-background . "grey75") (menu-bar-lines . 1) (tool-bar-lines . 0) (title) (wait-for-wm . t) (fullscreen . maximized) (tool-bar-position . top) (icon-type . t) (auto-raise) (auto-lower) (cursor-type . box) (scroll-bar-width . 0) (alpha) (horizontal-scroll-bars . t) (display-type . color) (background-mode . dark) (cursor-color . "#F8F8F2") (sticky) (environment) (frameset--id . "285D-7390-A80D-2B63") (frameset--mini t . t) (modeline . t) (minibuffer . t) (unsplittable) (icon-name) (display . ":0") (explicit-name) (visibility . t) (height . 36) (width . 149) (left . 0) (top . 28)) ((min-height . 12) (min-width . 30) (min-height-ignore . 9) (min-width-ignore . 12) (min-height-safe . 3) (min-width-safe . 6) (min-pixel-height . 228) (min-pixel-width . 270) (min-pixel-height-ignore . 171) (min-pixel-width-ignore . 108) (min-pixel-height-safe . 57) (min-pixel-width-safe . 54)) hc (pixel-width . 1366) (pixel-height . 665) (total-width . 152) (total-height . 35) (normal-height . 1.0) (normal-width . 1.0) (combination-limit) (leaf (pixel-width . 783) (pixel-height . 665) (total-width . 87) (total-height . 35) (normal-height . 1.0) (normal-width . 0.5731707317073171) (buffer "intermediario.c" (selected . t) (hscroll . 0) (fringes 9 9 nil) (margins nil) (scroll-bars 0 0 nil nil) (vscroll . 0) (dedicated) (point . 5076) (start . 4431))) (vc (last . t) (pixel-width . 583) (pixel-height . 665) (total-width . 65) (total-height . 35) (normal-height . 1.0) (normal-width . 0.4268292682926829) (combination-limit) (hc (pixel-width . 583) (pixel-height . 114) (total-width . 65) (total-height . 6) (normal-height . 0.18181818181818177) (normal-width . 1.0) (combination-limit) (leaf (pixel-width . 250) (pixel-height . 114) (total-width . 28) (total-height . 6) (normal-height . 1.0) (normal-width . 0.4285714285714286) (buffer "comun.h" (selected) (hscroll . 0) (fringes 9 9 nil) (margins nil) (scroll-bars 0 0 nil nil) (vscroll . 0) (dedicated) (point . 750) (start . 712))) (leaf (last . t) (pixel-width . 333) (pixel-height . 114) (total-width . 37) (total-height . 6) (normal-height . 1.0) (normal-width . 0.5714285714285714) (buffer "comun.c" (selected) (hscroll . 0) (fringes 9 9 nil) (margins nil) (scroll-bars 0 0 nil nil) (vscroll . 0) (dedicated) (point . 2669) (start . 2660)))) (leaf (pixel-width . 583) (pixel-height . 304) (total-width . 65) (total-height . 16) (normal-height . 0.4545454545454546) (normal-width . 1.0) (buffer "subscriptor.c" (selected) (hscroll . 0) (fringes 9 9 nil) (margins nil) (scroll-bars 0 0 nil nil) (vscroll . 0) (dedicated) (point . 966) (start . 946))) (leaf (last . t) (pixel-width . 583) (pixel-height . 247) (total-width . 65) (total-height . 13) (normal-height . 0.36363636363636365) (normal-width . 1.0) (buffer "edsu_comun.c" (selected) (hscroll . 0) (fringes 9 9 nil) (margins nil) (scroll-bars 0 0 nil nil) (vscroll . 0) (dedicated) (point . 1375) (start . 1253))))))])
+(setq desktop-missing-file-warning nil)
+(setq tags-file-name nil)
+(setq tags-table-list nil)
+(setq search-ring '("recibi" "constr" "co" "constr" "," ", " ","))
+(setq regexp-search-ring nil)
+(setq register-alist nil)
+(setq file-name-history '("/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/subscriptor/test_subscriptor_avanz.c" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/test_editor_avanz.c" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/comun.c" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/editor.h" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/subscriptor/test_subscriptor.c" "/home/serchiman/Desktop/Universidad/Sistemas Operativos/DATSI/so/servidor.2015a/cliente_src/cliente.c" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/edsu_comun.h" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/edsu_comun.c" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/comun.h" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/comun.c" "/home/serchiman/Desktop/Universidad/Sistemas Operativos/DATSI/so/filtrar.2015a/filtrar.c" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/Makefile" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/subscriptor/Makefile" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/intermediario/Makefile" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/Makefile" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/editor.h" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/comun.h" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/test_editor.c" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/subscriptor/subscriptor.c" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/editor.c" "/home/serchiman/Desktop/Universidad/Sistemas Operativos/DATSI/so/servidor.2015a/cliente_src/cliente.c" "/home/serchiman/Desktop/Universidad/Sistemas Operativos/DATSI/so/servidor.2015a/message.h" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/intermediario/comun.h" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/intermediario/intermediario.c" "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/intermediario/i"))
+
+;; Buffer section -- buffers listed in same order as in buffer list:
+(desktop-create-buffer 206
+  "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/intermediario/intermediario.c"
+  "intermediario.c"
+  'c-mode
+  '(abbrev-mode smartparens-mode auto-complete-mode rainbow-delimiters-mode)
+  5076
+  '(3830 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . utf-8-unix)))
+
+(desktop-create-buffer 206
+  "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/subscriptor/subscriptor.c"
+  "subscriptor.c"
+  'c-mode
+  '(abbrev-mode smartparens-mode auto-complete-mode rainbow-delimiters-mode)
+  966
+  '(798 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . utf-8-unix)))
+
+(desktop-create-buffer 206
+  "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/intermediario/comun.h"
+  "comun.h"
+  'c-mode
+  '(abbrev-mode smartparens-mode auto-complete-mode rainbow-delimiters-mode)
+  750
+  '(671 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . utf-8-unix)))
+
+(desktop-create-buffer 206
+  "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/edsu_comun.c"
+  "edsu_comun.c"
+  'c-mode
+  '(abbrev-mode smartparens-mode auto-complete-mode rainbow-delimiters-mode)
+  1375
+  '(1980 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . utf-8-unix)))
+
+(desktop-create-buffer 206
+  "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/comun.c"
+  "comun.c"
+  'c-mode
+  '(abbrev-mode smartparens-mode auto-complete-mode rainbow-delimiters-mode)
+  2669
+  '(204 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . utf-8-unix)))
+
+(desktop-create-buffer 206
+  "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/subscriptor/test_subscriptor_avanz.c"
+  "test_subscriptor_avanz.c"
+  'c-mode
+  '(abbrev-mode smartparens-mode auto-complete-mode rainbow-delimiters-mode)
+  792
+  '(nil nil)
+  nil
+  nil
+  '((buffer-file-coding-system . utf-8-unix)))
+
+(desktop-create-buffer 206
+  "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/editor.c"
+  "editor.c"
+  'c-mode
+  '(abbrev-mode smartparens-mode auto-complete-mode rainbow-delimiters-mode)
+  105
+  '(103 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . utf-8-unix)))
+
+(desktop-create-buffer 206
+  "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/edsu_comun.h"
+  "edsu_comun.h"
+  'c-mode
+  '(abbrev-mode smartparens-mode auto-complete-mode rainbow-delimiters-mode)
+  227
+  '(300 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . utf-8-unix)))
+
+(desktop-create-buffer 206
+  "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/subscriptor/test_subscriptor.c"
+  "test_subscriptor.c"
+  'c-mode
+  '(abbrev-mode smartparens-mode auto-complete-mode rainbow-delimiters-mode)
+  816
+  '(nil nil)
+  nil
+  nil
+  '((buffer-file-coding-system . utf-8-unix)))
+
+(desktop-create-buffer 206
+  "/home/serchiman/Desktop/Universidad/Sistemas Operativos/DATSI/so/servidor.2015a/cliente_src/cliente.c"
+  "cliente.c"
+  'c-mode
+  '(abbrev-mode smartparens-mode auto-complete-mode rainbow-delimiters-mode)
+  4008
+  '(2077 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . iso-latin-1-unix)))
+
+(desktop-create-buffer 206
+  "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/intermediario/servidor.c"
+  "servidor.c"
+  'c-mode
+  '(abbrev-mode smartparens-mode auto-complete-mode rainbow-delimiters-mode)
+  1769
+  '(7137 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . utf-8-unix)))
+
+(desktop-create-buffer 206
+  "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/test_editor_avanz.c"
+  "test_editor_avanz.c"
+  'c-mode
+  '(abbrev-mode smartparens-mode auto-complete-mode rainbow-delimiters-mode)
+  1139
+  '(nil nil)
+  nil
+  nil
+  '((buffer-file-coding-system . utf-8-unix)))
+
+(desktop-create-buffer 206
+  "/home/serchiman/Desktop/Universidad/Sistemas Operativos/DATSI/so/servidor.2015a/message.h"
+  "message.h"
+  'c-mode
+  '(abbrev-mode smartparens-mode auto-complete-mode rainbow-delimiters-mode)
+  448
+  '(nil nil)
+  nil
+  nil
+  '((buffer-file-coding-system . iso-latin-1-unix)))
+
+(desktop-create-buffer 206
+  "/home/serchiman/Desktop/Universidad/Sistemas Distribuidos/practica1_I/DATSI/SD/EDSU.2015/editor/test_editor.c"
+  "test_editor.c"
+  'c-mode
+  '(abbrev-mode smartparens-mode auto-complete-mode rainbow-delimiters-mode)
+  846
+  '(nil nil)
+  nil
+  nil
+  '((buffer-file-coding-system . utf-8-unix)))
+
