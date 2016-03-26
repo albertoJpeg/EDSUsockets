@@ -3,83 +3,36 @@
   necesitar compartir los módulos editor y subscriptor,
   si es que las hubiera.
 */
-
+#include "comun.h"
 #include "edsu_comun.h"
 
-int obtener_entorno(ENV *ent)
-{
-  if((ent->SERVIDOR = getenv("SERVIDOR"))==NULL)
-    {
-      fprintf(stderr,"Error: Variable de entorno SERVIDOR no definida\n");
-      return -1;
-    }
-
-  if((ent->PUERTO = getenv("PUERTO"))==NULL)
-    {
-      fprintf(stderr,"Error: Variable de entorno PUERTO no definida\n");
-      return -1;
-    }
-  return 0;
-}
-
-int conectar(ENT *ent)
-{
-  int sckt, port;
-  port = atoi(ent->PUERTO);
-  struct hostent *netdb;
-  SOCKADDR_IN serv_addr;
-  size_t addr_sz_s = sizeof(SOCKADDR_IN);
-  socklen_t addr_sz_sc = sizeof(SOCKADDR_IN);
-
-  netdb = gethostbyname(ent->SERVIDOR);
-
-  bzero((char*)&serv_addr, addr_sz_s);
-
-  serv_addr.sin_family = AF_INET;
-  memcpy(&(serv_addr.sin_addr), netdb->h_addr, netdb->h_length);
-  serv_addr.sin_port = htons(port);
-
-  if((sckt=socket(AF_INET, SOCK_STREAM, IPPROTO_TCP))==-1)
-    {
-      perror("Error");
-      return -1;
-    }
-
-  if(connect(sckt, (SOCKADDR*)&serv_addr, addr_sz_sc)==-1)
-    {
-      perror("Error");
-      return -1;
-    }
-  
-  return sckt;
-}
+int empaquetar_y_enviar(TOPIC_MSG *msg, int tipo, int sckt);
+int conectar(ENV *ent);
+int obtener_entorno(ENV *ent);
 
 //tipo, tema, valor
 int enviar_mensaje(int tipo, ...)
 {
-  int argc = 1; //siempre se recibe tema
   char *tema;
+  char *valor;
   va_list argv;
 
   switch(tipo)
     {
     case GENEV://tema, valor
-      argc = 2;
-      char *valor;
-      va_start(argv, argc);
+      va_start(argv, tipo);
       tema = va_arg(argv, char *);
       valor = va_arg(argv, char *);
       break;
     case NEWSC://no se recibe nada
     case FINSC:
-      argc = 0;
       break;
     default:
-      va_start(argv, argc);
+      va_start(argv, tipo);
       tema = va_arg(argv, char *);
     }
   
-  ENT ent;
+  ENV ent;
   if(obtener_entorno(&ent)==-1)
     return -1;
     
@@ -98,7 +51,7 @@ int enviar_mensaje(int tipo, ...)
       sprintf(msg.tp_nam, "%s", tema);
       sprintf(msg.tp_val, "%s", valor);
 
-      if(empaquetar_y_enviar(&msg, tipo)==-1)
+      if(empaquetar_y_enviar(&msg, tipo, sckt)==-1)
 	return -1;
       
       close(sckt);
@@ -108,7 +61,7 @@ int enviar_mensaje(int tipo, ...)
       msg.op = tipo;
       sprintf(msg.tp_nam, "%s", tema);
 
-      if(empaquetar_y_enviar(&msg, tipo)==-1)
+      if(empaquetar_y_enviar(&msg, tipo, sckt)==-1)
 	return -1;
       
       close(sckt);
@@ -118,7 +71,7 @@ int enviar_mensaje(int tipo, ...)
       msg.op = tipo;
       sprintf(msg.tp_nam, "%s", tema);
 
-      if(empaquetar_y_enviar(&msg, tipo)==-1)
+      if(empaquetar_y_enviar(&msg, tipo, sckt)==-1)
 	return -1;
       
       close(sckt);
@@ -127,7 +80,7 @@ int enviar_mensaje(int tipo, ...)
       /* Enviamos mensaje de nueva suscripción */
       msg.op = tipo;
 
-      if(empaquetar_y_enviar(&msg, tipo)==-1)
+      if(empaquetar_y_enviar(&msg, tipo, sckt)==-1)
 	return -1;
       
       close(sckt);
@@ -136,7 +89,7 @@ int enviar_mensaje(int tipo, ...)
       /* Enviamos mensaje de fin suscripción */
       msg.op = tipo;
       
-      if(empaquetar_y_enviar(&msg, tipo)==-1)
+      if(empaquetar_y_enviar(&msg, tipo, sckt)==-1)
 	return -1;
       
       close(sckt);
@@ -146,7 +99,7 @@ int enviar_mensaje(int tipo, ...)
       msg.op = tipo;
       sprintf(msg.tp_nam, "%s", tema);
 
-      if(empaquetar_y_enviar(&msg, tipo)==-1)
+      if(empaquetar_y_enviar(&msg, tipo, sckt)==-1)
 	return -1;
       
       close(sckt);
@@ -156,7 +109,7 @@ int enviar_mensaje(int tipo, ...)
       msg.op = tipo;
       sprintf(msg.tp_nam, "%s", tema);
 
-      if(empaquetar_y_enviar(&msg, tipo)==-1)
+      if(empaquetar_y_enviar(&msg, tipo, sckt)==-1)
 	return -1;
       
       close(sckt);
@@ -168,7 +121,7 @@ int enviar_mensaje(int tipo, ...)
 
 }
 
-int empaquetar_y_enviar(TOPIC_MSG *msg, int tipo)
+int empaquetar_y_enviar(TOPIC_MSG *msg, int tipo, int sckt)
 {
   size_t msg_sz;
   unsigned char *buf = 0;
@@ -227,4 +180,53 @@ int empaquetar_y_enviar(TOPIC_MSG *msg, int tipo)
     }
       
   return 0;
+}
+
+int obtener_entorno(ENV *ent)
+{
+  if((ent->SERVIDOR = getenv("SERVIDOR"))==NULL)
+    {
+      fprintf(stderr,"Error: Variable de entorno SERVIDOR no definida\n");
+      return -1;
+    }
+
+
+  if((ent->PUERTO = getenv("PUERTO"))==NULL)
+    {
+      fprintf(stderr,"Error: Variable de entorno PUERTO no definida\n");
+      return -1;
+    }
+  return 0;
+}
+
+int conectar(ENV *ent)
+{
+  int sckt, port;
+  port = atoi(ent->PUERTO);
+  struct hostent *netdb;
+  SOCKADDR_IN serv_addr;
+  size_t addr_sz_s = sizeof(SOCKADDR_IN);
+  socklen_t addr_sz_sc = sizeof(SOCKADDR_IN);
+
+  netdb = gethostbyname(ent->SERVIDOR);
+
+  bzero((char*)&serv_addr, addr_sz_s);
+
+  serv_addr.sin_family = AF_INET;
+  memcpy(&(serv_addr.sin_addr), netdb->h_addr, netdb->h_length);
+  serv_addr.sin_port = htons(port);
+
+  if((sckt=socket(AF_INET, SOCK_STREAM, IPPROTO_TCP))==-1)
+    {
+      perror("Error");
+      return -1;
+    }
+
+  if(connect(sckt, (SOCKADDR*)&serv_addr, addr_sz_sc)==-1)
+    {
+      perror("Error");
+      return -1;
+    }
+  
+  return sckt;
 }

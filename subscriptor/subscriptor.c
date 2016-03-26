@@ -1,9 +1,18 @@
-#include "subscriptor.h"
 #include "comun.h"
+#include "subscriptor.h"
 #include "edsu_comun.h"
 #include <pthread.h>
 
+#define PUERTO_LIBRE 0
+
 pthread_t notif;
+int exit_status;
+
+int activar_notificacion(void);
+void *recibir_notif(void *sckt);
+void (*evento)(const char*, const char*);
+void (*atema)(const char*);
+void (*btema)(const char*);
 
 int alta_subscripcion_tema(const char *tema) {
   return enviar_mensaje(ALTAT, tema);
@@ -17,12 +26,16 @@ int inicio_subscriptor(void (*notif_evento)(const char *, const char *),
 		       void (*alta_tema)(const char *),
 		       void (*baja_tema)(const char *))
 {
+  evento = notif_evento;
+  atema = alta_tema;
+  btema = baja_tema;
+  
   if(enviar_mensaje(NEWSC)==-1)
     return -1;
   
   if (activar_notificacion() == -1)
     {
-      fprintf("Error ");
+      fprintf(stderr, "Error al activar las notificaciones\n");
       return -1;
     }
     
@@ -38,14 +51,7 @@ int fin_subscriptor() {
   if(pthread_join(notif, (void**)&status)!=0)
     return -1;
 
-  if(*status == OK)
-    {
-      return 0;
-    }
-  else
-    {
-      return -1;
-    }
+  return *status==OK? 0: -1;
 }
 
 int activar_notificacion(void)
@@ -57,7 +63,7 @@ int activar_notificacion(void)
     return -1;
   
   
-  if(pthread_create(&notif, NULL, recibir_notif, (void*)sckt) != 0)
+  if(pthread_create(&notif, NULL, recibir_notif, &sckt) != 0)
     {
       perror("Error");
       return -1;
@@ -66,44 +72,45 @@ int activar_notificacion(void)
   return 0;
 }
 
-void *recibir_notif(void *sckt)
+void *recibir_notif(void *sck)
 {
+  int sckt = *((int*)sck);
   socklen_t addr_sz = sizeof(SOCKADDR_IN);
   int sckt_n;
   SOCKADDR_IN serv_addr;
-
   int fin = 0;
   while(!fin)
     {
       if((sckt_n = accept(sckt, (SOCKADDR*)&serv_addr, &addr_sz))==-1)
 	{
 	  perror("Error");
-	  pthread_exit(1);
+	  exit_status = -1;
+	  return(&exit_status);
 	}
 
       unsigned char buff[4096] = {0};
-      unsigned char resp[MAX_REC_SZ];
-      int offset = 0;
+      ssize_t tam;
       
-      while((tam=recv(sckt, (void*)resp, MAX_REC_SZ, 0))>0)
+      if((tam=recv(sckt, buff, MAX_REC_SZ, 0))==-1)
 	{
-	  memcpy(buff + offset, &buf, (size_t)tam);
-	  offset+=tam;
+	  perror("Error");
+	  exit_status = -1;
+	  return(&exit_status);
 	}
 
       TOPIC_MSG *msgI;
-      msgI = deserialize(buff, (size_t)offset);
+      msgI = deserialize(buff, (size_t)tam);
   
       switch(msgI->op)
 	{
 	case NOTIF:
-	  (*notif_evento)(msgI->tp_nam, msgI->tp_val);
+	  (*evento)(msgI->tp_nam, msgI->tp_val);
 	  break;
 	case NUEVT:
-	  (*alta_tema)(msgI->tp_nam);
+	  (*atema)(msgI->tp_nam);
 	  break;
 	case TEMAE:
-	  (*baja_tema)(msgI->tp_nam);
+	  (*btema)(msgI->tp_nam);
 	  break;
 	case OK:
 	  fin = OK;
@@ -114,6 +121,8 @@ void *recibir_notif(void *sckt)
 	}
       
       close(sckt_n);
-      pthread_exit(fin);
+      exit_status = fin;
+      return(&exit_status);
     }
+  return NULL;
 }  

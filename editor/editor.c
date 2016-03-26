@@ -1,8 +1,6 @@
-#include "editor.h"
 #include "comun.h"
+#include "editor.h"
 #include "edsu_comun.h"
-#include <netdb.h>
-#include <pthread.h>
 
 int generar_evento(const char *tema, const char *valor)
 {

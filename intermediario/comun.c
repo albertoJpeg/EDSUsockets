@@ -116,8 +116,8 @@ int abrir_puerto_escucha(int port, SOCKADDR_IN *serv_addr)
   int sckt;
   size_t addr_sz_s = sizeof(SOCKADDR_IN);
   socklen_t addr_sz_sc = sizeof(SOCKADDR_IN);
-
-  if((sckt=socket(AF_INET, SOCK_STREAM, IPPROTO_TCP))==-1)
+  //Beej's guide
+  if((sckt=socket(PF_INET, SOCK_STREAM, IPPROTO_TCP))==-1)
     {
       perror("Error");
       return -1;

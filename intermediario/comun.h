@@ -12,21 +12,30 @@
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
+#include <stdio.h>
+#include <netdb.h>
+#include <unistd.h>
 
+/* EDITOR -> INTERMEDIARIO */ 
 #define GENEV 1
 #define CREAT 2
 #define ELIMT 3
 
+/* SUSCRIPTOR -> INTERMEDIARIO */
 #define NEWSC 4
 #define FINSC 5
 #define ALTAT 6
 #define BAJAT 7
 
-#define NUEVT 11
-#define TEMAE 12
+/* INTERMEDIARIO -> SUSCRIPTOR */
 #define NOTIF 8
-#define OK 9
-#define ERROR 10
+#define NUEVT 9
+#define TEMAE 10
+
+/* INTERMEDIARIO -> EDITOR/SUSCRIPTOR */
+#define OK 11
+#define ERROR 12
 
 
 #define MAX_REC_SZ 512
