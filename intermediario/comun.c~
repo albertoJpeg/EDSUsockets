@@ -138,7 +138,7 @@ int abrir_puerto_escucha(int port, SOCKADDR_IN *serv_addr)
       return -1;
     }
   
-  if(listen(sckt, 10)==-1)
+  if(listen(sckt, MAX_CONNECT)==-1)
     {
       perror("Error");
       close(sckt);

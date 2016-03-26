@@ -15,13 +15,18 @@
 #define GENEV 1
 #define CREAT 2
 #define ELIMT 3
+
 #define NEWSC 4
 #define FINSC 5
 #define ALTAT 6
 #define BAJAT 7
+
+#define NUEVT 11
+#define TEMAE 12
 #define NOTIF 8
 #define OK 9
 #define ERROR 10
+
 
 #define MAX_REC_SZ 512
 #define MAX_CONNECT 10

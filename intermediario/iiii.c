@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <stdint.h>
 
 #define ENV 5
 #define MAX_REC_SZ 512
@@ -11,11 +13,14 @@ typedef struct topic_message
   char tp_val[64];
 }TOPIC_MSG;
 
+size_t serialize(const TOPIC_MSG *topic, unsigned char **buf);
+TOPIC_MSG *deserialize(const unsigned char *buf, const size_t bufSz);
 
 int main()
 {
   TOPIC_MSG msg;
   bzero((char*)&msg, sizeof(TOPIC_MSG));
+  
   char *tema = "elcolor";
   char *valor = "es bueno";
   msg.op = ENV;
@@ -23,30 +28,30 @@ int main()
   sprintf(msg.tp_nam, "%s", tema);
   sprintf(msg.tp_val, "%s", valor);
   
-  
+  printf("Sin serializar: El op=%d, el tema=%s, el valor=%s\n", msg.op, msg.tp_nam, msg.tp_val);
   size_t msg_sz;
   unsigned char *buf = 0;
-  msg_sz = serialize(msg, &buf);
-
+  msg_sz = serialize(&msg, &buf);
+  
   ssize_t tam;
   int fd[2];
   pipe(fd);
-  while((tam=send(fd[0], buf, msg_sz, 0))>0);
+  int j;
+  
+  tam=write(fd[1], buf, msg_sz);
 
   unsigned char buff[4096] = {0};
   unsigned char resp[MAX_REC_SZ];
   int offset = 0;
 
-  while((tam=recv(fd[1], (void*)resp, MAX_REC_SZ, 0))>0)
-    {
-      memcpy(buff + offset, &buf, (size_t)tam);
-      offset+=tam;
-    }
+  tam=read(fd[0], (void*)resp, MAX_REC_SZ);
+  memcpy(buff + offset, &buf, (size_t)tam);
+  offset+=tam;
 
   TOPIC_MSG *msgI;
-  msgI = deserialize(buff, (size_t)offset);
+  msgI = deserialize(buf, (size_t)offset);
 
-  printf("El op=%d, el tema=%s, el valor=%s\n", msgI->op, msgI->tp_nam, msgI->tp_val);
+  printf("Después de deserializar: El op=%d, el tema=%s, el valor=%s\n", msgI->op, msgI->tp_nam, msgI->tp_val);
 
   close(fd[0]);
   close(fd[1]);
@@ -54,15 +59,15 @@ int main()
   return 0;
 }
 
-size_t serialize(const TOPIC_MSG* topic, unsigned char** buf)
+size_t serialize(const TOPIC_MSG *topic, unsigned char **buf)
 {
 
-  const size_t tp_nam_sz, tp_val_sz, topic_size;
+  size_t tp_nam_sz, tp_val_sz, tp_sz;
   tp_nam_sz = topic->tp_nam ? strlen(topic->tp_nam) : 0;
   tp_val_sz   = topic->tp_val ? strlen(topic->tp_val) : 0;
-  tp_sz = sizeof(topic->op) + sizeof(size_t) + tp_nam_sz + sizeof(size_t) + tp_val_sz;
+  tp_sz = sizeof(uint32_t) + sizeof(uint32_t) + tp_nam_sz + sizeof(uint32_t) + tp_val_sz;
 
-  if((*buf = calloc(1, topic_size))==NULL)
+  if((*buf = calloc(1, tp_sz))==NULL)
     {
       perror("Error");
       return -1;
@@ -98,11 +103,11 @@ TOPIC_MSG *deserialize(const unsigned char *buf, const size_t bufSz)
   /* 4 bytes de int, 4 por cada size_t y los string de tamaño 0*/
   static const size_t MIN_BUF_SZ = 12;
 
-  TOPIC_MSG *topic = 0;
+  TOPIC_MSG *topic;
 
   if (buf && bufSz < MIN_BUF_SZ)
     {
-      fprintf("El tamaño del buffer es menor que el mínimo\n");
+      fprintf(stderr, "El tamaño del buffer es menor que el mínimo\n");
       return NULL;
     }
 
@@ -118,12 +123,12 @@ TOPIC_MSG *deserialize(const unsigned char *buf, const size_t bufSz)
   memcpy(&tmp, buf + offset, sizeof(tmp));
   tmp = ntohl(tmp);
   memcpy(&topic->op, &tmp, sizeof(topic->op));
-  offset  += sizeof(topic->op);
+  offset  += sizeof(uint32_t);
 
   // obtenemos el tamaño de tp_nam
   memcpy(&tmp, buf + offset, sizeof(tmp));
   tmp = ntohl(tmp);
-  offset  += sizeof(tmp);
+  offset  += sizeof(uint32_t);
 
   if (tmp > 0)
     {
@@ -133,7 +138,7 @@ TOPIC_MSG *deserialize(const unsigned char *buf, const size_t bufSz)
 
       if(strlen(topic->tp_nam) != (size_t)tmp)
 	{
-	  fprintf("El tamaño del nombre del tema no coincide con el enviado\n");
+	  fprintf(stderr, "El tamaño del nombre del tema no coincide con el enviado\n");
 	  return NULL;
 	}
       offset  += tmp;
@@ -142,7 +147,7 @@ TOPIC_MSG *deserialize(const unsigned char *buf, const size_t bufSz)
   // obtenemos el tamaño de tp_val
   memcpy(&tmp, buf + offset, sizeof(tmp));
   tmp = ntohl(tmp);
-  offset  += sizeof(tmp);
+  offset  += sizeof(uint32_t);
 
   if (tmp > 0)
     {
@@ -152,7 +157,7 @@ TOPIC_MSG *deserialize(const unsigned char *buf, const size_t bufSz)
 
       if(strlen(topic->tp_val) != tmp)
 	{
-	  fprintf("El tamaño del valor del tema no coincide con el enviado\n");
+	  fprintf(stderr, "El tamaño del valor del tema no coincide con el enviado\n");
 	  return NULL;
 	}
 
