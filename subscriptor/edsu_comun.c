@@ -15,6 +15,7 @@ int enviar_mensaje(int tipo, ...)
 {
   char *tema;
   char *valor;
+  int puerto;
   va_list argv;
 
   switch(tipo)
@@ -26,6 +27,14 @@ int enviar_mensaje(int tipo, ...)
       break;
     case NEWSC://no se recibe nada
     case FINSC:
+      va_start(argv, tipo);
+      puerto = va_arg(argv, int);
+      break;
+    case ALTAT:
+    case BAJAT:
+      va_start(argv, tipo);
+      tema = va_arg(argv, char *);
+      puerto = va_arg(argv, int);
       break;
     default:
       va_start(argv, tipo);
@@ -79,6 +88,7 @@ int enviar_mensaje(int tipo, ...)
     case NEWSC:
       /* Enviamos mensaje de nueva suscripción */
       msg.op = tipo;
+      msg.port = puerto;
 
       if(empaquetar_y_enviar(&msg, tipo, sckt)==-1)
 	return -1;
@@ -88,6 +98,7 @@ int enviar_mensaje(int tipo, ...)
     case FINSC:
       /* Enviamos mensaje de fin suscripción */
       msg.op = tipo;
+      msg.port = puerto;
       
       if(empaquetar_y_enviar(&msg, tipo, sckt)==-1)
 	return -1;
@@ -97,8 +108,9 @@ int enviar_mensaje(int tipo, ...)
     case ALTAT:
       /* Enviamos mensaje de alta a tema */
       msg.op = tipo;
+      msg.port = puerto;
       sprintf(msg.tp_nam, "%s", tema);
-
+      
       if(empaquetar_y_enviar(&msg, tipo, sckt)==-1)
 	return -1;
       
@@ -107,6 +119,7 @@ int enviar_mensaje(int tipo, ...)
     case BAJAT:
       /* Enviamos mensaje de baja a tema */
       msg.op = tipo;
+      msg.port = puerto;
       sprintf(msg.tp_nam, "%s", tema);
 
       if(empaquetar_y_enviar(&msg, tipo, sckt)==-1)

@@ -1,9 +1,9 @@
 #include "comun.h"
 
-int alta_usuario(SOCKADDR_IN *cli_addr);
-int baja_usuario(SOCKADDR_IN *cli_addr);
-int susc_usuario_tema(SOCKADDR_IN *cli_addr, const char *tema);
-int desusc_usuario_tema(SOCKADDR_IN *cli_addr, const char *tema);
+int alta_usuario(SOCKADDR_IN *cli_addr, int port);
+int baja_usuario(SOCKADDR_IN *cli_addr, int port);
+int susc_usuario_tema(SOCKADDR_IN *cli_addr, const char *tema, int port);
+int desusc_usuario_tema(SOCKADDR_IN *cli_addr, const char *tema, int port);
 int notificar_tema_nuevo(const char *tema);
 int notificar_tema_elim(const char *tema);
 int notificar_nuevo_evento(const char *tema, const char *valor);
@@ -126,25 +126,25 @@ int main(int argc, char *argv[])
 	    respuesta(OK, sckt);
 	  break;
 	case NEWSC:
-	  if(alta_usuario(&cli_addr)==-1)
+	  if(alta_usuario(&cli_addr, msg->port)==-1)
 	    respuesta(ERROR, sckt);
 	  else
 	    respuesta(OK, sckt);
 	  break;
 	case FINSC:
-	  if(baja_usuario(&cli_addr)==-1)
+	  if(baja_usuario(&cli_addr, msg->port)==-1)
 	    respuesta(ERROR, sckt);
 	  else
 	    respuesta(OK, sckt);
 	  break;
 	case ALTAT:
-	  if(susc_usuario_tema(&cli_addr, msg->tp_nam)==-1)
+	  if(susc_usuario_tema(&cli_addr, msg->tp_nam, msg->port)==-1)
 	    respuesta(ERROR, sckt);
 	  else
 	    respuesta(OK, sckt);
 	  break;
 	case BAJAT:
-	  if(desusc_usuario_tema(&cli_addr, msg->tp_nam)==-1)
+	  if(desusc_usuario_tema(&cli_addr, msg->tp_nam, msg->port)==-1)
 	    respuesta(ERROR, sckt);
 	  else
 	    respuesta(OK, sckt);
@@ -228,7 +228,7 @@ int notificar_nuevo_evento(const char *tema, const char *valor)
   int i;
   for(i=0; i<topics[event].mem_sz; i++)
     {
-      send_message(&msg, &(topics[event].mem[i]));
+       send_message(&msg, &(topics[event].mem[i]));
     }
   return 0;
 }
@@ -279,8 +279,10 @@ int notificar_tema_elim(const char *tema)
   return 0;
 }
 
-int alta_usuario(SOCKADDR_IN *cli_addr)
+int alta_usuario(SOCKADDR_IN *cli_addr, int port)
 {
+  cli_addr->sin_port = htons(port);
+  
   /* Si ya existe usuario error */
   if(buscar_usuario(cli_addr)!=-1)
     return -1;
@@ -292,8 +294,10 @@ int alta_usuario(SOCKADDR_IN *cli_addr)
   return 0;
 }
 
-int baja_usuario(SOCKADDR_IN *cli_addr)
+int baja_usuario(SOCKADDR_IN *cli_addr, int port)
 {
+  cli_addr->sin_port = htons(port);
+  
   /* Si no existe usuario error */
   if(buscar_usuario(cli_addr)==-1)
     return -1;
@@ -342,8 +346,10 @@ int remove_usuario(SOCKADDR_IN *cli_addr)
   return 0;
 }
 
-int susc_usuario_tema(SOCKADDR_IN *cli_addr, const char *tema)
+int susc_usuario_tema(SOCKADDR_IN *cli_addr, const char *tema, int port)
 {
+  cli_addr->sin_port = htons(port);
+  
   int tema_index;
   /* Tema no existe error */
   if((tema_index=buscar_tema(tema))==-1)
@@ -363,8 +369,10 @@ int susc_usuario_tema(SOCKADDR_IN *cli_addr, const char *tema)
   return 0;
 }
 
-int desusc_usuario_tema(SOCKADDR_IN *cli_addr, const char *tema)
+int desusc_usuario_tema(SOCKADDR_IN *cli_addr, const char *tema, int port)
 {
+  cli_addr->sin_port = htons(port);
+  
   int tema_index;
   /* Tema no existe error */
   if((tema_index=buscar_tema(tema))==-1)

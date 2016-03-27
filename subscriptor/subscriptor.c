@@ -5,8 +5,10 @@
 
 #define PUERTO_LIBRE 0
 
-pthread_t notif;
+pthread_t thread_notif;
 int exit_status;
+int puerto_notif;
+int sckt_notif;
 
 int activar_notificacion(void);
 void *recibir_notif(void *sckt);
@@ -15,11 +17,11 @@ void (*atema)(const char*);
 void (*btema)(const char*);
 
 int alta_subscripcion_tema(const char *tema) {
-  return enviar_mensaje(ALTAT, tema);
+  return enviar_mensaje(ALTAT, tema, puerto_notif);
 }
 
 int baja_subscripcion_tema(const char *tema) {
-  return enviar_mensaje(ALTAT, tema);
+  return enviar_mensaje(BAJAT, tema, puerto_notif);
 }
 
 int inicio_subscriptor(void (*notif_evento)(const char *, const char *),
@@ -30,72 +32,76 @@ int inicio_subscriptor(void (*notif_evento)(const char *, const char *),
   atema = alta_tema;
   btema = baja_tema;
   
-  if(enviar_mensaje(NEWSC)==-1)
-    return -1;
-  
-  if (activar_notificacion() == -1)
-    {
-      fprintf(stderr, "Error al activar las notificaciones\n");
-      return -1;
-    }
-    
-  return 0;
-}
-/* Avanzada */
-int fin_subscriptor() {
-
-  if(enviar_mensaje(FINSC)==-1)
-    return -1;
-
-  int *status;
-  if(pthread_join(notif, (void**)&status)!=0)
-    return -1;
-
-  return *status==OK? 0: -1;
-}
-
-int activar_notificacion(void)
-{
   SOCKADDR_IN cli_addr;
-  int sckt, port = PUERTO_LIBRE;
-
-  if((sckt = abrir_puerto_escucha(port, &cli_addr))==-1)
+  int port = PUERTO_LIBRE;
+  
+  if((sckt_notif = abrir_puerto_escucha(port, &cli_addr))==-1)
     return -1;
+
+  puerto_notif = ntohs(cli_addr.sin_port);
+
+  if(enviar_mensaje(NEWSC, puerto_notif)==-1)
+    return -1;
+
+#ifdef DEBUG
+  if(enviar_mensaje(ALTAT, "prueba", puerto_notif)==-1)
+    return -1;
+#endif
   
-  
-  if(pthread_create(&notif, NULL, recibir_notif, &sckt) != 0)
+  if(pthread_create(&thread_notif, NULL, recibir_notif, NULL) != 0)
     {
       perror("Error");
       return -1;
     }
 
+#ifdef DEBUG
+  sleep(30);
+  fin_subscriptor();
+#endif
+  
+  return 0;
+}
+/* Avanzada */
+int fin_subscriptor() {
+
+  if(enviar_mensaje(FINSC, puerto_notif)==-1)
+    return -1;
+
+  pthread_cancel(thread_notif);
+
+  if(pthread_join(thread_notif, NULL)!=0)
+    return -1;
+  
+  close(sckt_notif);
+  sckt_notif = 0;
+  puerto_notif = 0;
+
   return 0;
 }
 
-void *recibir_notif(void *sck)
+void *recibir_notif(void *p)
 {
-  int sckt = *((int*)sck);
-  socklen_t addr_sz = sizeof(SOCKADDR_IN);
   int sckt_n;
+  socklen_t addr_sz = sizeof(SOCKADDR_IN);
   SOCKADDR_IN serv_addr;
-  int fin = 0;
-  while(!fin)
+  
+  while(1)
     {
-      if((sckt_n = accept(sckt, (SOCKADDR*)&serv_addr, &addr_sz))==-1)
+      if((sckt_n = accept(sckt_notif, (SOCKADDR*)&serv_addr, &addr_sz))==-1)
 	{
 	  perror("Error");
 	  exit_status = -1;
-	  return(&exit_status);
+	  return &exit_status;
 	}
-
+      
       unsigned char buff[4096] = {0};
       ssize_t tam;
       
-      if((tam=recv(sckt, buff, MAX_REC_SZ, 0))==-1)
+      if((tam=recv(sckt_n, buff, MAX_REC_SZ, 0))==-1)
 	{
 	  perror("Error");
 	  exit_status = -1;
-	  return(&exit_status);
+	  return &exit_status;
 	}
 
       TOPIC_MSG *msgI;
@@ -112,17 +118,9 @@ void *recibir_notif(void *sck)
 	case TEMAE:
 	  (*btema)(msgI->tp_nam);
 	  break;
-	case OK:
-	  fin = OK;
-	  break;
-	case ERROR:
-	  fin = ERROR;
-	  break;
-	}
-      
-      close(sckt_n);
-      exit_status = fin;
-      return(&exit_status);
+	}    
+      close(sckt_n);      
     }
-  return NULL;
+  
+  return(&exit_status);
 }  

@@ -12,7 +12,7 @@ size_t serialize(const TOPIC_MSG *topic, unsigned char **buf)
   size_t tp_nam_sz, tp_val_sz, tp_sz;
   tp_nam_sz = topic->tp_nam ? strlen(topic->tp_nam) : 0;
   tp_val_sz   = topic->tp_val ? strlen(topic->tp_val) : 0;
-  tp_sz = sizeof(uint32_t) + sizeof(uint32_t) + tp_nam_sz + sizeof(uint32_t) + tp_val_sz;
+  tp_sz = sizeof(uint32_t)+sizeof(uint32_t)+sizeof(uint32_t)+tp_nam_sz+sizeof(uint32_t)+tp_val_sz;
 
   if((*buf = calloc(1, tp_sz))==NULL)
     {
@@ -27,6 +27,11 @@ size_t serialize(const TOPIC_MSG *topic, unsigned char **buf)
   tmp = htonl(topic->op);
   memcpy(*buf + offset, &tmp, sizeof(tmp));
   offset += sizeof(tmp);
+
+  // puerto
+  tmp = htonl(topic->port);
+  memcpy(*buf + offset, &tmp, sizeof(tmp));
+  offset += sizeof(tmp);  
 
   // tamaño de tp_nam y tp_nam
   tmp = htonl(tp_nam_sz);
@@ -47,8 +52,8 @@ size_t serialize(const TOPIC_MSG *topic, unsigned char **buf)
 
 TOPIC_MSG *deserialize(const unsigned char *buf, const size_t bufSz)
 {
-  /* 4 bytes de int, 4 por cada size_t y los string de tamaño 0*/
-  static const size_t MIN_BUF_SZ = 12;
+  /* 4B op, 4B port, 4x2 size_t tam, string de tamaño 0*/
+  static const size_t MIN_BUF_SZ = 16;
 
   TOPIC_MSG *topic;
 
@@ -70,6 +75,12 @@ TOPIC_MSG *deserialize(const unsigned char *buf, const size_t bufSz)
   memcpy(&tmp, buf + offset, sizeof(tmp));
   tmp = ntohl(tmp);
   memcpy(&topic->op, &tmp, sizeof(topic->op));
+  offset  += sizeof(uint32_t);
+
+  // obtenemos port
+  memcpy(&tmp, buf + offset, sizeof(tmp));
+  tmp = ntohl(tmp);
+  memcpy(&topic->port, &tmp, sizeof(topic->op));
   offset  += sizeof(uint32_t);
 
   // obtenemos el tamaño de tp_nam

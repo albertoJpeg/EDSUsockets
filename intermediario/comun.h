@@ -49,6 +49,7 @@ typedef struct sockaddr SOCKADDR;
 typedef struct topic_message
 {
   int op;
+  int port;
   char tp_nam[64];
   char tp_val[64];
 }TOPIC_MSG;
