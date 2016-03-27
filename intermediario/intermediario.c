@@ -1,6 +1,5 @@
 #include "comun.h"
-#include <unistd.h>
-#define DEBUG
+
 int alta_usuario(SOCKADDR_IN *cli_addr);
 int baja_usuario(SOCKADDR_IN *cli_addr);
 int susc_usuario_tema(SOCKADDR_IN *cli_addr, const char *tema);
@@ -31,7 +30,7 @@ typedef struct suscr
   SOCKADDR_IN susc_info;
 }SUSCR;
 
-int n_topics = 0, n_suscr = 0, n_avisos = 0;
+int n_topics = 0, n_suscr = 0;
 TOPIC *topics;
 SUSCR *suscr;
 
@@ -96,14 +95,7 @@ int main(int argc, char *argv[])
 	}
       unsigned char buff[4096] = {0};
       ssize_t tam;
-      /* unsigned char resp[MAX_REC_SZ]; */
-      //metodo 1
-      /* while((tam=recv(sckt, (void*)resp, MAX_REC_SZ, 0))>0) */
-      /* 	{ */
-      /* 	  memcpy(buff + offset, &buf, (size_t)tam); */
-      /* 	  offset+=tam; */
-      /* 	} */
-      //metodo 1
+
       if((tam=recv(sckt, buff, MAX_REC_SZ, 0))==-1)
 	{
 	  perror("Error");
@@ -112,29 +104,50 @@ int main(int argc, char *argv[])
 
       TOPIC_MSG *msg;
       msg = deserialize(buff, (size_t)tam);
-  
+      
       switch(msg->op)
 	{
 	case GENEV:
-	  notificar_nuevo_evento(msg->tp_nam, msg->tp_val)==-1? respuesta(ERROR, sckt) : respuesta(OK, sckt);
+	  if(notificar_nuevo_evento(msg->tp_nam, msg->tp_val)==-1)
+	    respuesta(ERROR, sckt);
+	  else
+	    respuesta(OK, sckt);
 	  break;
 	case CREAT:
-	  notificar_tema_nuevo(msg->tp_nam)==-1? respuesta(ERROR, sckt) : respuesta(OK, sckt);
+	  if(notificar_tema_nuevo(msg->tp_nam)==-1)
+	    respuesta(ERROR, sckt);
+	  else
+	    respuesta(OK, sckt);
 	  break;
 	case ELIMT:
-	  notificar_tema_elim(msg->tp_nam)==-1? respuesta(ERROR, sckt) : respuesta(OK, sckt);
+	  if(notificar_tema_elim(msg->tp_nam)==-1)
+	    respuesta(ERROR, sckt);
+	  else
+	    respuesta(OK, sckt);
 	  break;
 	case NEWSC:
-	  alta_usuario(&cli_addr)==-1? respuesta(ERROR, sckt) : respuesta(OK, sckt);
+	  if(alta_usuario(&cli_addr)==-1)
+	    respuesta(ERROR, sckt);
+	  else
+	    respuesta(OK, sckt);
 	  break;
 	case FINSC:
-	  baja_usuario(&cli_addr)==-1? respuesta(ERROR, sckt) : respuesta(OK, sckt);
+	  if(baja_usuario(&cli_addr)==-1)
+	    respuesta(ERROR, sckt);
+	  else
+	    respuesta(OK, sckt);
 	  break;
 	case ALTAT:
-	  susc_usuario_tema(&cli_addr, msg->tp_nam)==-1? respuesta(ERROR, sckt) : respuesta(OK, sckt);
+	  if(susc_usuario_tema(&cli_addr, msg->tp_nam)==-1)
+	    respuesta(ERROR, sckt);
+	  else
+	    respuesta(OK, sckt);
 	  break;
 	case BAJAT:
-	  desusc_usuario_tema(&cli_addr, msg->tp_nam)==-1? respuesta(ERROR, sckt) : respuesta(OK, sckt);	 
+	  if(desusc_usuario_tema(&cli_addr, msg->tp_nam)==-1)
+	    respuesta(ERROR, sckt);
+	  else
+	    respuesta(OK, sckt);
 	  break;
 	}
       close(sckt);
@@ -239,7 +252,7 @@ int notificar_tema_nuevo(const char *tema)
   sprintf(msg.tp_nam, "%s", tema);
 
   int i;
-  for(i=0; i<n_avisos; i++)
+  for(i=0; i<n_suscr; i++)
     {
       send_message(&msg, &(suscr[i].susc_info));
     }
@@ -259,7 +272,7 @@ int notificar_tema_elim(const char *tema)
   sprintf(msg.tp_nam, "%s", tema);
 
   int i;
-  for(i=0; i<n_avisos; i++)
+  for(i=0; i<n_suscr; i++)
     {
       send_message(&msg, &(suscr[i].susc_info));
     }
@@ -275,6 +288,7 @@ int alta_usuario(SOCKADDR_IN *cli_addr)
   /* Lo añadimos a la lista de suscriptores */
   memcpy(&(suscr[n_suscr].susc_info), cli_addr, sizeof(SOCKADDR_IN));
   suscr = realloc(suscr, (1+n_suscr)*sizeof(SUSCR));
+  n_suscr++;
   return 0;
 }
 
@@ -398,13 +412,18 @@ int remove_usuario_tema(const SOCKADDR_IN *cli_addr, const int index)
 
 int buscar_tema(const char *tema)
 {
-  int i, enc = 0;
+  int i, index;
+  bool enc = false;
   for (i=0; i<n_topics && !enc; i++)
     {
       if(strcmp(topics[i].tp_nam, tema)==0)
-	enc = i;
+	{
+	  enc = true;
+	  index = i;
+	}
+      
     }
-  return enc? enc : -1;
+  return enc? index : -1;
 }
 
 int remove_tema(const char *tema)

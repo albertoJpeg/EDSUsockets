@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 /* EDITOR -> INTERMEDIARIO */ 
 #define GENEV 1

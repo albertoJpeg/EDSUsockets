@@ -128,20 +128,22 @@ int empaquetar_y_enviar(TOPIC_MSG *msg, int tipo, int sckt)
   msg_sz = serialize(msg, &buf);
       
   ssize_t tam;
-  while((tam=send(sckt, buf, msg_sz, 0))>0);
+  if((tam=send(sckt, buf, msg_sz, 0))==-1)
+    {
+      perror("Error");
+      return -1;
+    }
       
   unsigned char buff[4096] = {0};
-  unsigned char resp[MAX_REC_SZ];
-  int offset = 0;
       
-  while((tam=recv(sckt, (void*)resp, MAX_REC_SZ, 0))>0)
+  if((tam=recv(sckt, buff, MAX_REC_SZ, 0))==-1)
     {
-      memcpy(buff + offset, &buf, (size_t)tam);
-      offset+=tam;
+      perror("Error");
+      return -1;
     }
       
   TOPIC_MSG *msgI;
-  msgI = deserialize(buff, (size_t)offset);
+  msgI = deserialize(buff, (size_t)tam);
       
   if(msgI->op==ERROR)
     {
@@ -216,7 +218,7 @@ int conectar(ENV *ent)
   memcpy(&(serv_addr.sin_addr), netdb->h_addr, netdb->h_length);
   serv_addr.sin_port = htons(port);
 
-  if((sckt=socket(AF_INET, SOCK_STREAM, IPPROTO_TCP))==-1)
+  if((sckt=socket(PF_INET, SOCK_STREAM, IPPROTO_TCP))==-1)
     {
       perror("Error");
       return -1;

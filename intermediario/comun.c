@@ -122,11 +122,11 @@ int abrir_puerto_escucha(int port, SOCKADDR_IN *serv_addr)
       perror("Error");
       return -1;
     }
-  
+  printf("abro el socket?");
   bzero((char*)serv_addr, addr_sz_s);
   
   serv_addr->sin_family=AF_INET;
-  serv_addr->sin_addr.s_addr=inet_addr(INADDR_ANY);
+  serv_addr->sin_addr.s_addr=INADDR_ANY;
   serv_addr->sin_port=htons(port);
     
   if(bind(sckt, (SOCKADDR*)serv_addr, addr_sz_sc)==-1)
@@ -135,7 +135,7 @@ int abrir_puerto_escucha(int port, SOCKADDR_IN *serv_addr)
       close(sckt);
       return -1;
     }
-  
+  printf("llego al bind?");
   if(listen(sckt, MAX_CONNECT)==-1)
     {
       perror("Error");
