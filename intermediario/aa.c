@@ -59,3 +59,28 @@ int buscar_usuario(SOCKADDR_IN *cli_addr)
     }
   return -1;
 }
+
+
+int remove_usuario(SOCKADDR_IN *cli_addr)
+{
+  int i;
+  for(i=0; i<n_topics; i++)
+    {
+      remove_usuario_tema(cli_addr, i);
+    }
+
+  int elem;
+  if((elem=buscar_usuario(cli_addr))==-1)
+    return -1;
+  
+  SUSCR *temp = malloc((n_suscr-1) * sizeof(SUSCR));
+
+  memmove(temp, suscr, (elem+1)*sizeof(SUSCR)); 
+
+  memmove(temp+elem, (suscr)+(elem+1), (n_suscr-elem)*sizeof(SUSCR));
+
+  n_suscr--;
+  free(suscr);
+  suscr = temp;
+  return 0;
+}
