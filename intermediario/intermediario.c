@@ -320,49 +320,6 @@ int baja_usuario(SOCKADDR_IN *cli_addr, int port)
   return 0;
 }
 
-int buscar_usuario(SOCKADDR_IN *cli_addr)
-{
-  int i;
-
-  for(i=0; i<n_suscr; i++)
-    {
-      if(suscr[i].susc_info.sin_addr.s_addr == cli_addr->sin_addr.s_addr &&
-	 suscr[i].susc_info.sin_port == cli_addr->sin_port)
-	return i;
-    }
-  return -1;
-}
-
-int remove_usuario(SOCKADDR_IN *cli_addr)
-{
-  int i;
-  for(i=0; i<n_topics; i++)
-    {
-      remove_usuario_tema(cli_addr, i);
-    }
-
-  int elem;
-  if((elem=buscar_usuario(cli_addr))==-1)
-    return -1;
-  
-  /* Debemos tener siempre 1 espacio extra */
-  SUSCR *temp = malloc((n_suscr) * sizeof(SUSCR));
-  if(!elem)
-    {
-      memmove(temp, suscr+1, (n_suscr-1)*sizeof(SUSCR));
-    }
-  else
-    {
-      memmove(temp, suscr, (elem)*sizeof(SUSCR));
-      memmove(temp+elem, suscr+1, (n_suscr-elem-1)*sizeof(SUSCR));
-    }
-  
-  free(suscr);
-  n_suscr--;
-  suscr = temp;
-  return 0;
-}
-
 int susc_usuario_tema(SOCKADDR_IN *cli_addr, const char *tema, int port)
 {
   cli_addr->sin_port = htons(port);
@@ -401,6 +358,35 @@ int desusc_usuario_tema(SOCKADDR_IN *cli_addr, const char *tema, int port)
   return 0;
 }
 
+int buscar_usuario(SOCKADDR_IN *cli_addr)
+{
+  int i;
+
+  for(i=0; i<n_suscr; i++)
+    {
+      if(suscr[i].susc_info.sin_addr.s_addr == cli_addr->sin_addr.s_addr &&
+	 suscr[i].susc_info.sin_port == cli_addr->sin_port)
+	return i;
+    }
+  return -1;
+}
+
+int buscar_tema(const char *tema)
+{
+  int i, index;
+  bool enc = false;
+  for (i=0; i<n_topics && !enc; i++)
+    {
+      if(strcmp(topics[i].tp_nam, tema)==0)
+	{
+	  enc = true;
+	  index = i;
+	}
+      
+    }
+  return enc? index : -1;
+}
+
 int buscar_usuario_tema(const SOCKADDR_IN *cli_addr, const int index)
 {
   int i;
@@ -411,6 +397,61 @@ int buscar_usuario_tema(const SOCKADDR_IN *cli_addr, const int index)
 	return i;
     }
   return -1;
+}
+
+int remove_usuario(SOCKADDR_IN *cli_addr)
+{
+  int i;
+  for(i=0; i<n_topics; i++)
+    {
+      remove_usuario_tema(cli_addr, i);
+    }
+
+  int elem;
+  if((elem=buscar_usuario(cli_addr))==-1)
+    return -1;
+  
+  /* Debemos tener siempre 1 espacio extra */
+  SUSCR *temp = malloc((n_suscr) * sizeof(SUSCR));
+  if(!elem)
+    {
+      memmove(temp, suscr+1, (n_suscr-1)*sizeof(SUSCR));
+    }
+  else
+    {
+      memmove(temp, suscr, (elem)*sizeof(SUSCR));
+      memmove(temp+elem, suscr+elem+1, (n_suscr-elem-1)*sizeof(SUSCR));
+    }
+  
+  free(suscr);
+  n_suscr--;
+  suscr = temp;
+  return 0;
+}
+
+int remove_tema(const char *tema)
+{
+  int elem;
+  if((elem=buscar_tema(tema))==-1)
+    return -1;
+  
+  /* Debemos tener siempre 1 espacio extra */
+  TOPIC *temp = malloc((n_topics)*sizeof(TOPIC));
+  if(!elem)
+    {
+      memmove(temp, topics+1, (n_topics-1)*sizeof(TOPIC));
+    }
+  else
+    {
+      memmove(temp, topics, (elem)*sizeof(TOPIC));
+      memmove(temp+elem, topics+elem+1, (n_topics-elem-1)*sizeof(TOPIC));
+    }
+  
+  free(topics[elem].mem);
+  free(topics);
+  n_topics--;
+  topics = temp;
+  return 0;
 }
 
 int remove_usuario_tema(const SOCKADDR_IN *cli_addr, const int index)
@@ -429,7 +470,7 @@ int remove_usuario_tema(const SOCKADDR_IN *cli_addr, const int index)
   else
     {
       memmove(temp, topics, (elem)*sizeof(SOCKADDR_IN));
-      memmove(temp+elem, topics+1, (tam-elem-1)*sizeof(SOCKADDR_IN));
+      memmove(temp+elem, topics+elem+1, (tam-elem-1)*sizeof(SOCKADDR_IN));
     }
   
   topics[index].mem_sz--;
@@ -437,46 +478,3 @@ int remove_usuario_tema(const SOCKADDR_IN *cli_addr, const int index)
   topics[index].mem = temp;
   return 0;
 }
-
-
-int buscar_tema(const char *tema)
-{
-  int i, index;
-  bool enc = false;
-  for (i=0; i<n_topics && !enc; i++)
-    {
-      if(strcmp(topics[i].tp_nam, tema)==0)
-	{
-	  enc = true;
-	  index = i;
-	}
-      
-    }
-  return enc? index : -1;
-}
-
-int remove_tema(const char *tema)
-{
-  int elem;
-  if((elem=buscar_tema(tema))==-1)
-    return -1;
-  
-  /* Debemos tener siempre 1 espacio extra */
-  TOPIC *temp = malloc((n_topics)*sizeof(TOPIC));
-  if(!elem)
-    {
-      memmove(temp, topics+1, (n_topics-1)*sizeof(TOPIC));
-    }
-  else
-    {
-      memmove(temp, topics, (elem)*sizeof(TOPIC));
-      memmove(temp+elem, topics+1, (n_topics-elem-1)*sizeof(TOPIC));
-    }
-  
-  free(topics[elem].mem);
-  free(topics);
-  n_topics--;
-  topics = temp;
-  return 0;
-}
-
