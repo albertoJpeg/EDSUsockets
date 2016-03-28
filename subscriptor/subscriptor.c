@@ -43,10 +43,10 @@ int inicio_subscriptor(void (*notif_evento)(const char *, const char *),
   if(enviar_mensaje(NEWSC, puerto_notif)==-1)
     return -1;
 
-#ifdef DEBUG
-  if(enviar_mensaje(ALTAT, "prueba", puerto_notif)==-1)
-    return -1;
-#endif
+/* #ifdef DEBUG */
+/*   if(enviar_mensaje(ALTAT, "prueba", puerto_notif)==-1) */
+/*     return -1; */
+/* #endif */
   
   if(pthread_create(&thread_notif, NULL, recibir_notif, NULL) != 0)
     {
@@ -54,10 +54,10 @@ int inicio_subscriptor(void (*notif_evento)(const char *, const char *),
       return -1;
     }
 
-#ifdef DEBUG
-  sleep(30);
-  fin_subscriptor();
-#endif
+/* #ifdef DEBUG */
+/*   sleep(30); */
+/*   fin_subscriptor(); */
+/* #endif */
   
   return 0;
 }
@@ -66,11 +66,13 @@ int fin_subscriptor() {
 
   if(enviar_mensaje(FINSC, puerto_notif)==-1)
     return -1;
-
-  pthread_cancel(thread_notif);
-
-  if(pthread_join(thread_notif, NULL)!=0)
-    return -1;
+  
+/* #ifdef DEBUG */
+/*   pthread_cancel(thread_notif); */
+  
+/*   if(pthread_join(thread_notif, NULL)!=0) */
+/*     return -1; */
+/* #endif */
   
   close(sckt_notif);
   sckt_notif = 0;

@@ -134,6 +134,13 @@ int abrir_puerto_escucha(int port, SOCKADDR_IN *serv_addr)
       return -1;
     }
 
+  // set SO_REUSEADDR on a socket to true
+  int optval = 1;
+  if (setsockopt(sckt, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval))==-1) {
+    perror("Error");
+    return 1;
+  }
+  
   bzero((char*)serv_addr, addr_sz_s);
   
   serv_addr->sin_family=AF_INET;
