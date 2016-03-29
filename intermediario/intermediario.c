@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
 	  break;
 	}
       close(sckt);
-
+      free(msg); //liberamos memoria deserialize
     }
   
   for(i=0;i<n_topics;i++)
@@ -209,6 +209,7 @@ int send_message(TOPIC_MSG *msg, SOCKADDR_IN *cliente)
       exit(EXIT_FAILURE);
     }
 
+  free(buf);//liberamos memoria del serialize
   close(sckt);
   return 0;
 }
@@ -294,7 +295,7 @@ int alta_usuario(SOCKADDR_IN *cli_addr, int port)
   TOPIC_MSG msg;
   bzero((char*)&msg, sizeof(TOPIC_MSG));
 
-  msg.op = NOTIF;
+  msg.op = NUEVT;
   int i;
   for(i=0; i<n_topics; i++)
     {
@@ -469,8 +470,8 @@ int remove_usuario_tema(const SOCKADDR_IN *cli_addr, const int index)
     }
   else
     {
-      memmove(temp, topics, (elem)*sizeof(SOCKADDR_IN));
-      memmove(temp+elem, topics+elem+1, (tam-elem-1)*sizeof(SOCKADDR_IN));
+      memmove(temp, topics[index].mem, (elem)*sizeof(SOCKADDR_IN));
+      memmove(temp+elem, topics[index].mem+elem+1, (tam-elem-1)*sizeof(SOCKADDR_IN));
     }
   
   topics[index].mem_sz--;

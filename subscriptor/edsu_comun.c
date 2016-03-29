@@ -193,7 +193,8 @@ int empaquetar_y_enviar(TOPIC_MSG *msg, int tipo, int sckt)
 	}
       return -1;
     }
-      
+  free(buf);//serialize
+  free(msgI);//deserialize
   return 0;
 }
 

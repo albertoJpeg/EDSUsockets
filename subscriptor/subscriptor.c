@@ -43,10 +43,10 @@ int inicio_subscriptor(void (*notif_evento)(const char *, const char *),
   if(enviar_mensaje(NEWSC, puerto_notif)==-1)
     return -1;
 
-/* #ifdef DEBUG */
-/*   if(enviar_mensaje(ALTAT, "prueba", puerto_notif)==-1) */
-/*     return -1; */
-/* #endif */
+#ifdef DEBUG
+  if(enviar_mensaje(ALTAT, "prueba", puerto_notif)==-1)
+    return -1;
+#endif
   
   if(pthread_create(&thread_notif, NULL, recibir_notif, NULL) != 0)
     {
@@ -54,10 +54,10 @@ int inicio_subscriptor(void (*notif_evento)(const char *, const char *),
       return -1;
     }
 
-/* #ifdef DEBUG */
-/*   sleep(30); */
-/*   fin_subscriptor(); */
-/* #endif */
+#ifdef DEBUG
+  sleep(30);
+  fin_subscriptor();
+#endif
   
   return 0;
 }
@@ -67,12 +67,12 @@ int fin_subscriptor() {
   if(enviar_mensaje(FINSC, puerto_notif)==-1)
     return -1;
   
-/* #ifdef DEBUG */
-/*   pthread_cancel(thread_notif); */
+#ifdef DEBUG
+  pthread_cancel(thread_notif);
   
-/*   if(pthread_join(thread_notif, NULL)!=0) */
-/*     return -1; */
-/* #endif */
+  if(pthread_join(thread_notif, NULL)!=0)
+    return -1;
+#endif
   
   close(sckt_notif);
   sckt_notif = 0;
@@ -99,7 +99,7 @@ void *recibir_notif(void *p)
       unsigned char buff[4096] = {0};
       ssize_t tam;
       
-      if((tam=recv(sckt_n, buff, MAX_REC_SZ, 0))==-1)
+      if((tam=recv(sckt_n, buff, MAX_REC_SZ, 0))<=0)
 	{
 	  perror("Error");
 	  exit_status = -1;
@@ -115,13 +115,16 @@ void *recibir_notif(void *p)
 	  (*evento)(msgI->tp_nam, msgI->tp_val);
 	  break;
 	case NUEVT:
-	  (*atema)(msgI->tp_nam);
+	  if(atema)
+	    (*atema)(msgI->tp_nam);
 	  break;
 	case TEMAE:
-	  (*btema)(msgI->tp_nam);
+	  if(btema)
+	    (*btema)(msgI->tp_nam);
 	  break;
 	}    
-      close(sckt_n);      
+      close(sckt_n);
+      free(msgI);//deserialize
     }
   
   return(&exit_status);
