@@ -117,7 +117,7 @@ int main(){
 
 
   
-
+  free(topics);
 }
 
 int remove_tema(const char *tema)
@@ -162,7 +162,6 @@ int notificar_tema_nuevo(const char *tema)
   topics[n_topics].mem_sz = 0;
   topics[n_topics++].mem = malloc(sizeof(SOCKADDR_IN));
   topics = realloc(topics, (1+n_topics)*sizeof(TOPIC));
-
   return 0;
 }
 
